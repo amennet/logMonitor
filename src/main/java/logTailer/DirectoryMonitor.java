@@ -19,6 +19,11 @@ public class DirectoryMonitor implements Runnable {
 
     private MetaData meta_Data;
 
+    /**
+     * 初始化目录监控
+     * @param monitorDir 监控目录
+     * @param metaData 监控结果保存的文件
+     */
     public DirectoryMonitor(String monitorDir, MetaData metaData) {
         monitor_dir = monitorDir;
         try {
@@ -42,24 +47,10 @@ public class DirectoryMonitor implements Runnable {
         }
         for (WatchEvent<?> event : key.pollEvents()) {
             System.out.println(event.context() + "发生了" + event.kind() + "事件");
-            List<String> inodes = getInodes();
+            List<String> inodes = InodeUtil.getInodes(monitor_dir);
             if (inodes != null && inodes.size() > 0)
                 meta_Data.writeFile(inodes);
         }
-    }
-
-    private List<String> getInodes() {
-        ArrayList<String> list = null;
-        File file = new File(monitor_dir);
-        if (file.exists() && file.isDirectory()) {
-            File[] files = file.listFiles();
-            list = new ArrayList<>();
-            for (File f : files) {
-                long inode = InodeUtil.getInode(f.getAbsolutePath());
-                list.add(String.valueOf(inode));
-            }
-        }
-        return list;
     }
 
     public static void main(String[] args) {

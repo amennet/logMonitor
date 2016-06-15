@@ -1,10 +1,13 @@
 package fileMonitor.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Admin on 2016/6/13.
@@ -23,5 +26,19 @@ public class InodeUtil {
             e.printStackTrace();
         }
         return inode;
+    }
+
+    public static List<String> getInodes(String path) {
+        ArrayList<String> list = null;
+        File file = new File(path);
+        if (file.exists() && file.isDirectory()) {
+            File[] files = file.listFiles();
+            list = new ArrayList<>();
+            for (File f : files) {
+                long inode = InodeUtil.getInode(f.getAbsolutePath());
+                list.add(String.valueOf(inode));
+            }
+        }
+        return list;
     }
 }
